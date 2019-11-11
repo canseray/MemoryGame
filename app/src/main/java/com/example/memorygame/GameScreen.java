@@ -1,92 +1,98 @@
 package com.example.memorygame;
 
-import android.accessibilityservice.AccessibilityService;
+
 import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.GridLayout;
 import android.widget.TextView;
 
-public class GameScreen extends AppCompatActivity {
-    int lastCard = 0;
-    int score = 0;
-    int fail = 0;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.gridlayout.widget.GridLayout;
+
+import static com.example.memorygame.Constants.FAIL;
+import static com.example.memorygame.Constants.MESSAGE;
+import static com.example.memorygame.Constants.NAME;
+import static com.example.memorygame.Constants.SCORE;
+
+public class GameScreen extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String LOG_TAG = GameScreen.class.getSimpleName();
+
+    private TextView mMessageView;
+    private String mMessage;
+
+    private int mLastCard = 0;
+    private int mScore = 0;
+    private int mFail = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
-        Intent intent = getIntent();
-        GridLayout gameCards = (GridLayout) findViewById(R.id.gameCards);
-        final TextView message = (TextView)findViewById(R.id.textView2);
-        Cards allCards[] = new Cards[16];
-        final String name = intent.getStringExtra("message");
+        GridLayout gameCards = findViewById(R.id.gameCards);
+        mMessageView = findViewById(R.id.messageView);
+        mMessage = getIntent().getStringExtra(MESSAGE);
+        Card[] allCards = new Card[16];
 
-        for(int j=1 ; j<16 ; j++){
-            allCards [j-1] = new Cards(this,j);
-            allCards[j-1].setOnClickListener(new View.OnClickListener(){
-
-                @Override
-                public void onClick (View view){
-                    final Cards c = (Cards)view;
-                    c.flip();
-                    if(lastCard>0){
-                        final Cards c2 = (Cards)findViewById(lastCard);
-                        if(c2.frontID==c.frontID && c2.getId() !=c.getId()){
-
-                            Button u = (Button)findViewById(c2.getId());
-                            u.setClickable(false);
-                            Button y = (Button)findViewById(c.getId());
-                            y.setClickable(false);
-
-                            c2.isFlippable=false;
-                            c.isFlippable=false;
-                            score++;
-                            message.setText("True!");
-
-                            if(score==8){
-                                Intent intent = new Intent(GameScreen.this,Result.class);
-                                intent.putExtra("Fail",fail);
-                                intent.putExtra("Score",score);
-                                intent.putExtra("Name",name);
-                                startActivity(intent);
-                            }
-                        }
-                        else{
-                            Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    c2.flip();
-                                    c.flip();
-                                }
-                            },500);
-                            fail++;
-                            message.setText("Fail eşleşme " + name);
-
-                        }
-                        lastCard=0;
-                    }
-                    else{
-
-                        lastCard=c.getId();
-                    }
-                }
-            });
+        for (int j = 1; j <= 16; j++) {
+            allCards[j - 1] = new Card(this, j);
+            allCards[j - 1].setOnClickListener(this);
         }
-        for(int j=0 ; j<24 ; j++){
-            int rndm = (int)(Math.random()*16);
-            Cards c = allCards[rndm];
-            allCards[rndm]=allCards[j];
-            allCards[j]=c;
-        }
-        for(int j=0 ; j<16 ; j++){
+        // TODO fix here, probably it was implemented for shuffling but it throws IndexOutOfBoundsException
+//        for (int j = 0; j < 24; j++) {
+//            int random = (int) (Math.random() * 16);
+//            Card c = allCards[random];
+//            allCards[random] = allCards[j];
+//            allCards[j] = c;
+//        }
+        for (int j = 0; j < 16; j++) {
             gameCards.addView(allCards[j]);
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        final Card selectedCard = (Card) view;
+        selectedCard.flip();
+        if (mLastCard > 0) {
+            final Card c2 = findViewById(mLastCard);
+            if (c2.getFrontResId() == selectedCard.getFrontResId() && c2.getId() != selectedCard.getId()) {
+
+                Button u = findViewById(c2.getId());
+                u.setClickable(false);
+                Button y = findViewById(selectedCard.getId());
+                y.setClickable(false);
+
+                c2.setFlippable(false);
+                selectedCard.setFlippable(false);
+                mScore++;
+                mMessageView.setText(getString(R.string.truee));
+
+                if (mScore == 8) {
+                    Intent intent = new Intent(GameScreen.this, ResultActivity.class);
+                    intent.putExtra(FAIL, mFail);
+                    intent.putExtra(SCORE, mScore);
+                    intent.putExtra(NAME, mMessage);
+                    startActivity(intent);
+                }
+            } else {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        c2.flip();
+                        selectedCard.flip();
+                    }
+                }, 500);
+                mFail++;
+                mMessageView.setText(getString(R.string.failing_match, mMessage));
+
+            }
+            mLastCard = 0;
+        } else {
+            mLastCard = selectedCard.getId();
         }
     }
 }

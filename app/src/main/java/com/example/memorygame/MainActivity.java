@@ -1,11 +1,13 @@
 package com.example.memorygame;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import static com.example.memorygame.Constants.MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,16 +15,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final EditText editText = (EditText) findViewById(R.id.editText);
+        final EditText editText = findViewById(R.id.nameEditText);
 
-        ((Button) findViewById(R.id.button)).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.playButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, GameScreen.class);
-                intent.putExtra("message", editText.getText().toString());
+                intent.putExtra(MESSAGE, editText.getText().toString());
                 startActivity(intent);
             }
-         });
+        });
 
     }
 }
