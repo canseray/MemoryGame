@@ -3,7 +3,7 @@ package com.example.memorygame;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-
+import android.view.ViewGroup;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatDrawableManager;
 
@@ -12,63 +12,69 @@ public class Card extends AppCompatButton {
 
     private static final String LOG_TAG = Card.class.getSimpleName();
 
+    private boolean mIsFlipped = false;
+    private boolean mIsFlippable = true;
+    private Drawable mFrontDrawable;
+    private Drawable mBackDrawable;
     private int mFrontResId = 0;
 
-    private Drawable mBackDrawable;
-    private Drawable mFrontDrawable;
-
-    private boolean mIsFlippable = true;
-    private boolean mIsFlipped = false;
-
-    public Card(Context context, int id) {
+    public Card(Context context, int id){
         super(context);
         setId(id);
-        mBackDrawable = AppCompatDrawableManager.get().getDrawable(context, R.drawable.back);
+        mBackDrawable = AppCompatDrawableManager.get().getDrawable(context,R.drawable.vader);
         mFrontDrawable = AppCompatDrawableManager.get().getDrawable(context, mFrontResId);
         setBackground(mBackDrawable);
+
+        ViewGroup.LayoutParams params = getLayoutParams();
+        if (params != null){
+            params.width = 250;
+            params.height = 250;
+        } else {
+            params = new ViewGroup.LayoutParams(250,250);
+        }
+        setLayoutParams(params);
     }
 
-    @Override
-    public void setId(int id) {
+    public void setId(int id){
         super.setId(id);
         if (id % 8 == 0)
-            mFrontResId = R.drawable.c8;
-        if (id % 8 == 1)
             mFrontResId = R.drawable.c1;
-        if (id % 8 == 2)
+        if (id % 8 == 1)
             mFrontResId = R.drawable.c2;
-        if (id % 8 == 3)
+        if (id % 8 == 2)
             mFrontResId = R.drawable.c3;
-        if (id % 8 == 4)
+        if (id % 8 == 3)
             mFrontResId = R.drawable.c4;
-        if (id % 8 == 5)
+        if (id % 8 == 4)
             mFrontResId = R.drawable.c5;
-        if (id % 8 == 6)
+        if (id % 8 == 5)
             mFrontResId = R.drawable.c6;
-        if (id % 8 == 7)
+        if (id % 8 == 6)
             mFrontResId = R.drawable.c7;
+        if (id % 8 == 7)
+            mFrontResId = R.drawable.c8;
     }
 
-    public int getFrontResId() {
+    public int getmFrontResId(){
         return mFrontResId;
     }
 
-    public boolean isFlippable() {
-        return mIsFlippable;
-    }
-
-    public void setFlippable(boolean flippable) {
-        mIsFlippable = flippable;
-    }
-
-    public boolean isFlipped() {
+    public boolean isFlipped(){
         return mIsFlipped;
     }
 
-    public void flip() {
+    public boolean isFlippable(){
+        return mIsFlippable;
+    }
+
+    public void setFlippable(boolean flippable){
+        mIsFlippable = flippable;
+    }
+
+    public void flip(){
         if (!mIsFlippable)
             return;
-        if (!mIsFlipped) {
+        if (!mIsFlipped){
             setBackground(mFrontDrawable);
             mIsFlipped = true;
         } else {
@@ -76,4 +82,13 @@ public class Card extends AppCompatButton {
             mIsFlipped = false;
         }
     }
+
+
+
+
+
+
+
+
 }
+
